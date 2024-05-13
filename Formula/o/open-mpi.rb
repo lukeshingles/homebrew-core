@@ -4,6 +4,7 @@ class OpenMpi < Formula
   url "https://download.open-mpi.org/release/open-mpi/v5.0/openmpi-5.0.3.tar.bz2"
   sha256 "990582f206b3ab32e938aa31bbf07c639368e4405dca196fabe7f0f76eeda90b"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :homepage
@@ -78,7 +79,7 @@ class OpenMpi < Formula
 
     # Work around asm incompatibility with new linker (FB13194320)
     # https://github.com/open-mpi/ompi/issues/11935
-    args << "--with-wrapper-ldflags=-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
+    args << "--with-wrapper-fcflags=-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
 
     system "./autogen.pl", "--force" if build.head?
     system "./configure", *std_configure_args, *args
