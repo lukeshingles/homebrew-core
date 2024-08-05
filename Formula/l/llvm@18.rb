@@ -1,8 +1,8 @@
 class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
-  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.0-rc2/llvm-project-19.1.0-rc2.src.tar.xz"
-  sha256 "e6a72922f6999ce02a1da46059b479fc15fbd474eef0f3689a28cede0e8f1d86"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/llvm-project-18.1.8.src.tar.xz"
+  sha256 "0b58557a6d32ceee97c8d533a59b9212d87e0fc4d2833924eb6c611247db2f2a"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/llvm/llvm-project.git", branch: "main"
@@ -72,7 +72,6 @@ class Llvm < Formula
       libcxx
       libcxxabi
       libunwind
-      pstl
     ]
 
     unless versioned_formula?
@@ -148,7 +147,7 @@ class Llvm < Formula
 
       args << "-DLLVM_BUILD_LLVM_C_DYLIB=ON"
       args << "-DLLVM_ENABLE_LIBCXX=ON"
-      args << "-DLIBCXX_PSTL_BACKEND=libdispatch"
+      args << "-DLIBCXX_PSTL_CPU_BACKEND=libdispatch"
       args << "-DLIBCXX_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
       args << "-DLIBCXXABI_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
       args << "-DDEFAULT_SYSROOT=#{macos_sdk}" if macos_sdk
