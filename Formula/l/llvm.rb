@@ -1,8 +1,8 @@
 class Llvm < Formula
   desc "Next-gen compiler infrastructure"
   homepage "https://llvm.org/"
-  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/llvm-project-18.1.8.src.tar.xz"
-  sha256 "0b58557a6d32ceee97c8d533a59b9212d87e0fc4d2833924eb6c611247db2f2a"
+  url "https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.0/llvm-project-19.1.0.src.tar.xz"
+  sha256 "5042522b49945bc560ff9206f25fb87980a9b89b914193ca00d961511ff0673c"
   # The LLVM Project is under the Apache License v2.0 with LLVM Exceptions
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/llvm/llvm-project.git", branch: "main"
@@ -74,6 +74,7 @@ class Llvm < Formula
       libcxx
       libcxxabi
       libunwind
+      pstl
     ]
 
     unless versioned_formula?
@@ -149,7 +150,7 @@ class Llvm < Formula
 
       args << "-DLLVM_BUILD_LLVM_C_DYLIB=ON"
       args << "-DLLVM_ENABLE_LIBCXX=ON"
-      args << "-DLIBCXX_PSTL_CPU_BACKEND=libdispatch"
+      args << "-DLIBCXX_PSTL_BACKEND=libdispatch"
       args << "-DLIBCXX_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
       args << "-DLIBCXXABI_INSTALL_LIBRARY_DIR=#{libcxx_install_libdir}"
       args << "-DDEFAULT_SYSROOT=#{macos_sdk}" if macos_sdk
@@ -390,7 +391,9 @@ class Llvm < Formula
       llvm_version = Utils.safe_popen_read(bin/"llvm-config", "--version").strip
       soversion = Version.new(llvm_version).major.to_s
       soversion << "git" if llvm_version.end_with?("git")
-      soversion << "rc" if llvm_version.end_with?("rc")
+      if (match = llvm_version.match(/-rc\d*$/))
+        soversion << match[0]
+      end
 
       # Install versioned symlink, or else `llvm-config` doesn't work properly
       lib.install_symlink "libLLVM.dylib" => "libLLVM-#{soversion}.dylib"
@@ -455,8 +458,8 @@ class Llvm < Formula
 
     if llvm_version.end_with?("git")
       soversion << "git"
-    elsif llvm_version.end_with?("rc")
-      soversion << "rc"
+    elsif (match = llvm_version.match(/-rc\d*$/))
+      soversion << match[0]
     else
       assert_equal version, llvm_version
     end
@@ -667,9 +670,10 @@ class Llvm < Formula
         }
       EOS
 
+      rpath_flag = "-Wl,-rpath,#{lib}/#{Hardware::CPU.arch}-unknown-linux-gnu" if OS.linux?
       system bin/"clang", "-L#{lib}", "-fopenmp", "-nobuiltininc",
-                             "-I#{lib}/clang/#{llvm_version_major}/include",
-                             "omptest.c", "-o", "omptest"
+                          "-I#{lib}/clang/#{llvm_version_major}/include",
+                          rpath_flag.to_s, "omptest.c", "-o", "omptest"
       testresult = shell_output("./omptest")
 
       sorted_testresult = testresult.split("\n").sort.join("\n")
