@@ -4,6 +4,7 @@ class Halide < Formula
   url "https://github.com/halide/Halide/archive/refs/tags/v18.0.0.tar.gz"
   sha256 "1176b42a3e2374ab38555d9316c78e39b157044b5a8e765c748bf3afd2edb351"
   license "MIT"
+  revision 1
   head "https://github.com/halide/Halide.git", branch: "main"
 
   livecheck do
