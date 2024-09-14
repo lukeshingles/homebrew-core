@@ -2,7 +2,7 @@ class Wasmedge < Formula
   desc "Lightweight, high-performance, and extensible WebAssembly runtime"
   homepage "https://WasmEdge.org/"
   license "Apache-2.0"
-  revision 1
+  revision 2
   head "https://github.com/WasmEdge/WasmEdge.git", branch: "master"
 
   stable do
@@ -31,6 +31,12 @@ class Wasmedge < Formula
   depends_on "fmt"
   depends_on "llvm"
   depends_on "spdlog"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "zstd"
+  end
 
   def install
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args
