@@ -4,6 +4,7 @@ class IncludeWhatYouUse < Formula
   url "https://include-what-you-use.org/downloads/include-what-you-use-0.22.src.tar.gz"
   sha256 "859074b461ea4b8325a73418c207ca33b5e6566b08e6b587eb9164416569a6dd"
   license "NCSA"
+  revision 1
   head "https://github.com/include-what-you-use/include-what-you-use.git", branch: "master"
 
   # This omits the 3.3, 3.4, and 3.5 versions, which come from the older
@@ -27,7 +28,7 @@ class IncludeWhatYouUse < Formula
   end
 
   depends_on "cmake" => :build
-  depends_on "llvm"
+  depends_on "llvm@18"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
