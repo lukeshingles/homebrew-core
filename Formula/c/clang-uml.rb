@@ -4,6 +4,7 @@ class ClangUml < Formula
   url "https://github.com/bkryza/clang-uml/archive/refs/tags/0.5.4.tar.gz"
   sha256 "445ae69e9ef7dcc50d0352dcd79d8c55994a7bebd84684f95405fd81168338c4"
   license "Apache-2.0"
+  revision 1
   head "https://github.com/bkryza/clang-uml.git", branch: "master"
 
   bottle do
@@ -19,7 +20,7 @@ class ClangUml < Formula
 
   depends_on "cmake" => [:build, :test]
   depends_on "pkg-config" => :build
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "yaml-cpp"
 
   fails_with gcc: "5"
@@ -30,6 +31,7 @@ class ClangUml < Formula
   end
 
   def install
+    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath(target: llvm.opt_lib)}" if OS.linux?
     args = %w[
       -DBUILD_TESTS=OFF
     ]
