@@ -4,6 +4,7 @@ class Pocl < Formula
   url "https://github.com/pocl/pocl/archive/refs/tags/v6.0.tar.gz"
   sha256 "de9710223fc1855f833dbbf42ea2681e06aa8ec0464f0201104dc80a74dfd1f2"
   license "MIT"
+  revision 1
   head "https://github.com/pocl/pocl.git", branch: "main"
 
   livecheck do
@@ -26,20 +27,24 @@ class Pocl < Formula
   depends_on "opencl-headers" => :build
   depends_on "pkg-config" => :build
   depends_on "hwloc"
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "opencl-icd-loader"
   uses_from_macos "python" => :build
 
   fails_with gcc: "5" # LLVM is built with GCC
 
+  def llvm
+    deps.map(&:to_formula).find { |f| f.name.match?(/^llvm(@\d+)?$/) }
+  end
+
   def install
-    llvm = Formula["llvm"]
     # Install the ICD into #{prefix}/etc rather than #{etc} as it contains the realpath
     # to the shared library and needs to be kept up-to-date to work with an ICD loader.
     # This relies on `brew link` automatically creating and updating #{etc} symlinks.
+    rpaths = [loader_path, rpath(source: lib/"pocl"), rpath(target: llvm.opt_lib)]
     args = %W[
       -DPOCL_INSTALL_ICD_VENDORDIR=#{prefix}/etc/OpenCL/vendors
-      -DCMAKE_INSTALL_RPATH=#{loader_path};#{rpath(source: lib/"pocl")}
+      -DCMAKE_INSTALL_RPATH=#{rpaths.join(";")}
       -DENABLE_EXAMPLES=OFF
       -DENABLE_TESTS=OFF
       -DWITH_LLVM_CONFIG=#{llvm.opt_bin}/llvm-config
