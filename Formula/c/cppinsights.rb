@@ -4,7 +4,7 @@ class Cppinsights < Formula
   url "https://github.com/andreasfertig/cppinsights/archive/refs/tags/v_17.0.tar.gz"
   sha256 "2dd6bcfcdba65c0ed2e1f04ef79d57285186871ad8bd481d63269f3115276216"
   license "MIT"
-  revision 1
+  revision 2
 
   bottle do
     sha256 cellar: :any,                 arm64_sequoia:  "a98eb7b557dfbbec2513985ca276c36ac0d3850d278ecdb5d7d17ed6337aa279"
@@ -18,21 +18,24 @@ class Cppinsights < Formula
   end
 
   depends_on "cmake" => :build
-  depends_on "llvm"
-
-  fails_with :clang do
-    build 1300
-    cause "Requires C++20"
+  depends_on "llvm@18"
+  on_macos do
+     depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1500
   end
 
-  # Patch from https://github.com/andreasfertig/cppinsights/pull/622
-  # Support for LLVM 18, remove in next version
-  patch :DATA
+  fails_with :clang do
+    build 1599
+    cause "Requires Clang 16 or later"
+  end
 
   def install
-    ENV.llvm_clang if ENV.compiler == :clang && DevelopmentTools.clang_build_version <= 1500
+    if OS.mac? && DevelopmentTools.clang_build_version <= 1500
+      ENV.llvm_clang
+      ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib
+    end
 
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "-S", ".", "-B", "build", "-DINSIGHTS_LLVM_CONFIG=#{Formula["llvm@18"].opt_bin}/llvm-config",
+           "-DINSIGHTS_USE_SYSTEM_INCLUDES=Off", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
@@ -46,50 +49,3 @@ class Cppinsights < Formula
     assert_match "{2, 3, 4, 0, 0}", shell_output("#{bin}/insights ./test.cpp")
   end
 end
-__END__
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 31341709..8b7430db 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -1,5 +1,4 @@
--cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
--# 3.8* is required because of C++17 support
-+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
- 
- # For better control enable MSVC_RUNTIME_LIBRARY target property
- # see https://cmake.org/cmake/help/latest/policy/CMP0091.html
-@@ -33,7 +32,7 @@ option(INSIGHTS_STATIC              "Use static linking"         Off)
- 
- set(INSIGHTS_LLVM_CONFIG "llvm-config" CACHE STRING "LLVM config executable to use")
- 
--set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 17)
-+set(INSIGHTS_MIN_LLVM_MAJOR_VERSION 18)
- set(INSIGHTS_MIN_LLVM_VERSION ${INSIGHTS_MIN_LLVM_MAJOR_VERSION}.0)
- 
- if(NOT DEFINED LLVM_VERSION_MAJOR)  # used when build inside the clang tool/extra folder
-@@ -372,6 +371,17 @@ if (BUILD_INSIGHTS_OUTSIDE_LLVM)
-     # additional libs required when building insights outside llvm
-     set(ADDITIONAL_LIBS
-         ${LLVM_LDFLAGS}
-+    )
-+
-+    if(${LLVM_PACKAGE_VERSION_PLAIN} VERSION_GREATER_EQUAL "18.0.0")
-+        set(ADDITIONAL_LIBS
-+            ${ADDITIONAL_LIBS}
-+            clangAPINotes
-+        )
-+    endif()
-+
-+    set(ADDITIONAL_LIBS
-+        ${ADDITIONAL_LIBS}
-         clangFrontend
-         clangDriver
-         clangSerialization
-@@ -768,6 +778,7 @@ message(STATUS "[ Build summary ]")
- message(STATUS "CMAKE_GENERATOR       : ${CMAKE_GENERATOR}")
- message(STATUS "CMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}")
- message(STATUS "CMAKE_LINKER          : ${CMAKE_LINKER}")
-+message(STATUS "CMAKE_OSX_ARCHITECTURES : ${CMAKE_OSX_ARCHITECTURES}")
- message(STATUS "Compiler ID           : ${CMAKE_CXX_COMPILER_ID}")
- message(STATUS "Compiler version      : ${CMAKE_CXX_COMPILER_VERSION}")
- message(STATUS "Compiler path         : ${CMAKE_CXX_COMPILER}")
