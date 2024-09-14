@@ -4,6 +4,7 @@ class C2rust < Formula
   url "https://github.com/immunant/c2rust/archive/refs/tags/v0.19.0.tar.gz"
   sha256 "912c28e5e289d1a9ef1e0f6c89db97eba19eda58625ca8bdc5b513fdb3c19ba4"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
     sha256 cellar: :any,                 arm64_sequoia:  "34a4e0a9c45c009219de7577f411f54d32ffa3ffdd0f2417a00f8b0587bad7eb"
@@ -18,7 +19,7 @@ class C2rust < Formula
 
   depends_on "cmake" => [:build, :test]
   depends_on "rust" => :build
-  depends_on "llvm"
+  depends_on "llvm@18"
 
   fails_with gcc: "5"
 
