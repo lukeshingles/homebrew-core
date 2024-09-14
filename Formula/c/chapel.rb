@@ -4,7 +4,7 @@ class Chapel < Formula
   url "https://github.com/chapel-lang/chapel/releases/download/2.1.0/chapel-2.1.0.tar.gz"
   sha256 "72593c037505dd76e8b5989358b7580a3fdb213051a406adb26a487d26c68c60"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/chapel-lang/chapel.git", branch: "main"
 
   bottle do
@@ -22,7 +22,7 @@ class Chapel < Formula
   depends_on "gmp"
   depends_on "hwloc"
   depends_on "jemalloc"
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "pkg-config"
   depends_on "python@3.12"
 
