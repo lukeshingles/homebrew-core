@@ -4,6 +4,7 @@ class Ldc < Formula
   url "https://github.com/ldc-developers/ldc/releases/download/v1.39.0/ldc-1.39.0-src.tar.gz"
   sha256 "839bac36f6073318e36f0b163767e03bdbd3f57d99256b97494ac439b59a4562"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/ldc-developers/ldc.git", branch: "master"
 
   livecheck do
@@ -25,7 +26,7 @@ class Ldc < Formula
   depends_on "cmake" => :build
   depends_on "libconfig" => :build
   depends_on "pkg-config" => :build
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "zstd"
 
   uses_from_macos "libxml2" => :build
@@ -94,7 +95,7 @@ class Ldc < Formula
     EOS
     system bin/"ldc2", "test.d"
     assert_match "Hello, world!", shell_output("./test")
-    with_env(PATH: "#{Formula["llvm"].opt_bin}:#{ENV["PATH"]}") do
+    with_env(PATH: "#{llvm.opt_bin}:#{ENV["PATH"]}") do
       system bin/"ldc2", "-flto=thin", "--linker=lld", "test.d"
       assert_match "Hello, world!", shell_output("./test")
       system bin/"ldc2", "-flto=full", "--linker=lld", "test.d"
