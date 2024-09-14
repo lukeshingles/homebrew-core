@@ -4,6 +4,7 @@ class Llgo < Formula
   url "https://github.com/goplus/llgo/archive/refs/tags/v0.9.7.tar.gz"
   sha256 "f9721be0b41d1e622923b4aa1d4e8071af93753f36f4c9285697e6af009fa0dc"
   license "Apache-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any, arm64_sequoia:  "9662d4ef9ac28e8fa0fb323e72639f9ff1b8929d2b92a3310968eb21972e5df3"
@@ -18,26 +19,30 @@ class Llgo < Formula
 
   depends_on "bdw-gc"
   depends_on "go"
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "openssl@3"
   depends_on "pkg-config"
+
+  def llvm
+    deps.map(&:to_formula).find { |f| f.name.match?(/^llvm(@\d+)?$/) }
+  end
 
   def install
     if OS.linux?
       ENV.prepend "CGO_CPPFLAGS",
-        "-I#{Formula["llvm"].opt_include} " \
+        "-I#{llvm.opt_include} " \
         "-D_GNU_SOURCE " \
         "-D__STDC_CONSTANT_MACROS " \
         "-D__STDC_FORMAT_MACROS " \
         "-D__STDC_LIMIT_MACROS"
-      ENV.prepend "CGO_LDFLAGS", "-L#{Formula["llvm"].opt_lib} -lLLVM"
+      ENV.prepend "CGO_LDFLAGS", "-L#{llvm.opt_lib} -lLLVM"
     end
 
     ldflags = %W[
       -s -w
       -X github.com/goplus/llgo/x/env.buildVersion=v#{version}
       -X github.com/goplus/llgo/x/env.buildTime=#{time.iso8601}
-      -X github.com/goplus/llgo/xtool/env/llvm.ldLLVMConfigBin=#{Formula["llvm"].opt_bin/"llvm-config"}
+      -X github.com/goplus/llgo/xtool/env/llvm.ldLLVMConfigBin=#{llvm.opt_bin/"llvm-config"}
     ]
     build_args = *std_go_args(ldflags:)
     build_args += ["-tags", "byollvm"] if OS.linux?
@@ -45,7 +50,7 @@ class Llgo < Formula
 
     libexec.install "LICENSE", "README.md"
 
-    path = %w[go llvm pkg-config].map { |f| Formula[f].opt_bin }.join(":")
+    path = llvm.opt_bin + ":" + %w[go pkg-config].map { |f| Formula[f].opt_bin }.join(":")
     opt_lib = %w[bdw-gc openssl@3].map { |f| Formula[f].opt_lib }.join(":")
 
     (libexec/"bin").children.each do |f|
