@@ -6,7 +6,7 @@ class Buku < Formula
   url "https://github.com/jarun/buku/archive/refs/tags/v4.9.tar.gz"
   sha256 "1e432270ae78c7852110dcf2c2e215893bcc338299a4998f14a1f6b26e37bfac"
   license "GPL-3.0-or-later"
-  revision 2
+  revision 3
   head "https://github.com/jarun/buku.git", branch: "master"
 
   bottle do
@@ -22,7 +22,7 @@ class Buku < Formula
 
   depends_on "certifi"
   depends_on "cryptography"
-  depends_on "python@3.12"
+  depends_on "python@3.13"
 
   uses_from_macos "expect" => :test
   uses_from_macos "libffi"
