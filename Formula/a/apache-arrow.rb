@@ -5,7 +5,7 @@ class ApacheArrow < Formula
   mirror "https://archive.apache.org/dist/arrow/arrow-17.0.0/apache-arrow-17.0.0.tar.gz"
   sha256 "9d280d8042e7cf526f8c28d170d93bfab65e50f94569f6a790982a878d8d898d"
   license "Apache-2.0"
-  revision 4
+  revision 5
   head "https://github.com/apache/arrow.git", branch: "main"
 
   bottle do
@@ -27,7 +27,7 @@ class ApacheArrow < Formula
   depends_on "c-ares"
   depends_on "glog"
   depends_on "grpc"
-  depends_on "llvm"
+  depends_on "llvm@18"
   depends_on "lz4"
   depends_on "openssl@3"
   depends_on "protobuf"
@@ -43,10 +43,13 @@ class ApacheArrow < Formula
 
   fails_with gcc: "5"
 
+  def llvm
+    deps.map(&:to_formula).find { |f| f.name.match?(/^llvm(@\d+)?$/) }
+  end
+
   def install
     # Work around an Xcode 15 linker issue which causes linkage against LLVM's
     # libunwind due to it being present in a library search path.
-    llvm = Formula["llvm"]
     ENV.remove "HOMEBREW_LIBRARY_PATHS", llvm.opt_lib if DevelopmentTools.clang_build_version >= 1500
 
     # We set `ARROW_ORC=OFF` because it fails to build with Protobuf 27.0
