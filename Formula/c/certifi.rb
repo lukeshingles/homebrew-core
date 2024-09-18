@@ -4,6 +4,7 @@ class Certifi < Formula
   url "https://files.pythonhosted.org/packages/b0/ee/9b19140fe824b367c04c5e1b369942dd754c4c5462d5674002f75c4dedc1/certifi-2024.8.30.tar.gz"
   sha256 "bec941d2aa8195e248a60b31ff9f0558284cf01a52591ceda73ea9afffd69fd9"
   license "MPL-2.0"
+  revision 1
 
   bottle do
     sha256 cellar: :any_skip_relocation, arm64_sequoia:  "0d53b46299ad29dfbaeb9c9d642887efb7235ddec1ed39ec144469114970fe6b"
@@ -18,6 +19,7 @@ class Certifi < Formula
 
   depends_on "python@3.11" => [:build, :test]
   depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "ca-certificates"
 
   def pythons
