@@ -2,7 +2,7 @@ class Creduce < Formula
   desc "Reduce a C/C++ program while keeping a property of interest"
   homepage "https://github.com/csmith-project/creduce"
   license "BSD-3-Clause"
-  revision 4
+  revision 5
   head "https://github.com/csmith-project/creduce.git", branch: "master"
 
   # Remove when patches are no longer needed.
@@ -69,7 +69,7 @@ class Creduce < Formula
   end
 
   depends_on "astyle"
-  depends_on "llvm"
+  depends_on "llvm@18"
 
   uses_from_macos "flex" => :build
   uses_from_macos "perl"
