@@ -4,6 +4,7 @@ class Nanobind < Formula
   url "https://github.com/wjakob/nanobind/archive/refs/tags/v2.1.0.tar.gz"
   sha256 "c37c53c60ada5fe1c956e24bd4b83af669a2309bf952bd251f36a7d2fa3bacf0"
   license "BSD-3-Clause"
+  revision 1
   head "https://github.com/wjakob/nanobind.git", branch: "master"
 
   bottle do
@@ -11,7 +12,7 @@ class Nanobind < Formula
   end
 
   depends_on "cmake" => [:build, :test]
-  depends_on "python@3.12" => [:build, :test]
+  depends_on "python@3.13" => [:build, :test]
   depends_on "robin-map" => [:build, :test]
 
   def install
@@ -33,7 +34,7 @@ class Nanobind < Formula
   end
 
   test do
-    python = "python3.12"
+    python = "python3.13"
 
     (testpath/"my_ext.cpp").write <<~CPP
       #include <nanobind/nanobind.h>
