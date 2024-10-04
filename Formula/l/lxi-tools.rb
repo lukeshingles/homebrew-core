@@ -4,6 +4,7 @@ class LxiTools < Formula
   url "https://github.com/lxi-tools/lxi-tools/archive/refs/tags/v2.7.tar.gz"
   sha256 "6196980e82be2d143aa7f52e8e4612866b570cfce225d7d61698d2eeb1bf8a00"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
     sha256 cellar: :any,                 arm64_sequoia:  "d93843c76e98292a902cc56309e4a5ffb7e27f1ea0a2649e54de2ac5dac97681"
@@ -48,6 +49,7 @@ class LxiTools < Formula
     system "meson", "install", "-C", "build"
 
     rm("#{share}/glib-2.0/schemas/gschemas.compiled")
+    rm("#{share}/applications/mimeinfo.cache")
   end
 
   def post_install
